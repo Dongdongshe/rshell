@@ -40,7 +40,7 @@ while(1)
 		while(next != 0) {     // get arguments of each commands
 			cmd[i] = next;
 			char* begin = next;
-			printf("%s\n", next);
+			//printf("%s\n", next);
 	        
 	        switch (flag) //run next command based on operator and return 
 		    {             //of former command
@@ -75,7 +75,7 @@ static int run(char *cmd[], char *args[], int i) // execute command
     int a = 0;
 	while (cmd[i] != NULL){
 		args[a] = cmd[i];
-		printf("%s\n", args[a]);
+		//printf("%s\n", args[a]);
 		++a;
 		cmd[i] = strtok(NULL, " \n");}
 		
