@@ -1,0 +1,111 @@
+Script started on Fri 23 Jan 2015 11:17:45 PM PST
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ bin/rshell 
+(null)@ubuntu>>ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>ls -a
+.  ..  bin  exec.script  .git  LICENSE	Makefile  README.md  rshell  src
+(null)@ubuntu>>ls -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a a -   -a -a -a -a -a -a a-    -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a -a a-    -a a -   -a a-  -a a -a -a a -   a -a -a a -a  
+.  ..  bin  exec.script  .git  LICENSE	Makefile  README.md  rshell  src
+(null)@ubuntu>>     ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>   ls     ls  -a
+.  ..  bin  exec.script  .git  LICENSE	Makefile  README.md  rshell  src
+(null)@ubuntu>>lls 
+Command not found(null)@ubuntu>>lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+Command not found(null)@ubuntu>>l ***ls***
+Command not found(null)@ubuntu>>ls    &ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>|ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>;ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>ls; *****
+Command not found(null)@ubuntu>>ls;
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+Segmentation fault (core dumped)
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ r[K./rshell 
+(null)@ubuntu>>ls  |
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+wrong operator(null)@ubuntu>>ls&
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+wrong operator(null)@ubuntu>>&&&&&&&&&ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>ls  &&&&&&ls;\\\\    |||||
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+Segmentation fault (core dumped)
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ :::::::::::::[K[K[K[K[K[K[K[K[K[K[K[K[K;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+bash: syntax error near unexpected token `;;'
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Segmentation fault (core dumped)
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>ls: ;e exit||t ls a -a=      pwd && ping -c 4 8.8.8.8
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ping [K[K[K[K[K./rshell 
+(null)@ubuntu>>ls  ||ls||;      ;&ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>ls;;ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>ls||ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+(null)@ubuntu>>ls&&ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+wrong operator(null)@ubuntu>>ls; &*&;ls    ^%$;;||ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+Command not foundbin  exec.script  LICENSE  Makefile  README.md	rshell	src
+wrong operator(null)@ubuntu>>ls *^&& ls
+ls: cannot access *^: No such file or directory
+wrong operator(null)@ubuntu>>7 ls \ ||***&&ls
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+wrong operator(null)@ubuntu>>;s  ls;ls;ls;ls;ls;ls;ls;ls;ls;ls;sl;sl;sl;sl;sl;sls;l;sl;sdlf;ad;f;adf;adf;a;fa;;ag;a;fa;f;a;fa;g;a;f;;faw;ef;a;f;weaf;a;f;asf;;adf;as;f;adf;a;f;asfdaf
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+bin  exec.script  LICENSE  Makefile  README.md	rshell	src
+Command not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not foundCommand not found
+
+ldasf
+ladfakd;f
+
+
+aldf
+af
+adf
+lad
+^C
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ex[K[Kls:[K'[K&[K||ex[K[K[K[K[K[K./rshell 
+(null)@ubuntu>>ls||exi
+a.out  bin  exec.script  LICENSE  Makefile  README.md  rshell  src
+(null)@ubuntu>>ls  ||exit
+a.out  bin  exec.script  LICENSE  Makefile  README.md  rshell  src
+(null)@ubuntu>>ls && exit
+a.out  bin  exec.script  LICENSE  Makefile  README.md  rshell  src
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>exit
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>ls  ;e    ||exit
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>&&e	xit
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>       exit
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>*********************exit
+Command not found(null)@ubuntu>>|||||||||||||||||||||||exit
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ .r[K/rshell 
+(null)@ubuntu>>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;exit
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>&&&&&&&&&&&&&&&&&&&&exit
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ ./rshell 
+(null)@ubuntu>>exit  &&&&&&&&&&&&&&&&
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ exit
+Script done on Fri 23 Jan 2015 11:28:46 PM PST
