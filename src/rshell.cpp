@@ -5,14 +5,12 @@
 #include <sys/wait.h>
 #include <sys/mman.h>
 
-static int run(char * cmd[], char *args[], int i, int ret);
+static int run(char * cmd[], char *args[], int i);
 void clean(char *args[]);
 int ope(char * cut, char * a, char * b, char* c);
-using namespace std;
-
 int main(int argc, char **argv, char **envp)
 {
-char line[1024];
+char line[1024]; 
 char *args[1024];
 char host[100];
 char *user;
@@ -21,57 +19,57 @@ char *save;
 
 while(1)
 	{
-		user = getlogin();
-		gethostname(host, 100);
-		printf("%s@%s>>", user, host);	        
+		user = getlogin();    //get user name
+		gethostname(host, 100);    //get os name
+		printf("%s@%s>>", user, host);	        //print machine info
         fflush(NULL);
 
-        if(!fgets(line, 1024, stdin))
+        if(!fgets(line, 1024, stdin))       
         	return 0;
-		char * cut = line;
+		char * cut = line;            
 		int flag = 0;
-		cut = strtok(line, "#");
+		char input[1024];
 
-	    char input[1024];
-	    strncpy(input, cut, strlen(cut));
-		char* next = strtok_r(cut, ";|&", &save);
-		int ret = 0;
-		
+		cut = strtok(line, "#");   //cut off characters following #
+	    strncpy(input, cut, strlen(cut));   //save the input to a array		
+		char* next = strtok_r(cut, ";|&", &save); //devide input into commands
+		int ret = 0;		
 		int i = 0;
 		char *cmd[1024];
 
-		while(next != 0) {
+		while(next != 0) {     // get arguments of each commands
 			cmd[i] = next;
 			char* begin = next;
 			printf("%s\n", next);
 	        
-	        switch (flag)
-		    {
-				case(0): 
-					ret = run(cmd, args, i, ret);
+	        switch (flag) //run next command based on operator and return 
+		    {             //of former command
+				case(0):  // case of ;
+					ret = run(cmd, args, i);
 					break;
-				case(1):
-					if (ret == 1)  ret = run(cmd, args, i, ret);
+				case(1): // case of ||
+					if (ret == 1)  ret = run(cmd, args, i);
 					break;
-				case(2):
-					if (ret == 0)  ret = run(cmd, args,i, ret);
+				case(2):// case of &&
+					if (ret == 0)  ret = run(cmd, args,i);
+				case(3): // case of the others
+					printf("wrong operator");
 					break;
 			}		
 	
-			clean(args);			
+			clean(args);  //clean arguments 
 			i++;
 			next = strtok_r(NULL, ";|&", &save);
 			char *end = next;
-			flag = ope(cut, begin, end, input);
+			flag = ope(cut, begin, end, input); //detect operator
 		}
 
 	}
 	return 0;
 }
 
-static int run(char *cmd[], char *args[], int i, int ret)
+static int run(char *cmd[], char *args[], int i) // execute command
 { 
-	//int ret = 0;
 	int status;
 	cmd[i] = strtok(cmd[i], " \n");
     int a = 0;
@@ -81,7 +79,7 @@ static int run(char *cmd[], char *args[], int i, int ret)
 		++a;
 		cmd[i] = strtok(NULL, " \n");}
 		
-		if (strcmp(args[0], "exit") == 0)		
+		if (strcmp(args[0], "exit") == 0)  //inner exit command
 			exit(0);
 		else
 		{
@@ -93,18 +91,18 @@ static int run(char *cmd[], char *args[], int i, int ret)
 		else if (pid == 0)
 		{
 			if (execvp(args[0], args) != 0)
-				("Command not found");
+				printf("Command not found");
             exit(1);											
 		}
 	    else {
-	    	if( wait(&status) == -1)
-				perror("error");
-	        return WEXITSTATUS(status);	    
+	    	if( wait(&status) == -1)  //save the child process exit value
+				perror("error");      // to statue and return it to parent 
+	        return WEXITSTATUS(status);	//process    
 	    }	    
 	}
 }
 
-void clean(char *args[]) 
+void clean(char *args[])  
 {
 	int i = 0;
 	while (args[i] != NULL)
@@ -117,15 +115,15 @@ void clean(char *args[])
 int ope(char *cut, char * a , char * b, char* c){
 	char *d = c;
 	char e[1024];
-	d= d + (a - cut);
-//	printf("%s\n", d);
+	d= d + (a - cut);   
     if(b!= NULL) {
-	strncpy(e,d, b-a);
-	if (strstr(e, ";") !=NULL) return 0;
+	strncpy(e,d, b-a);  //get operator from input
+	if (strstr(e, ";") !=NULL) return 0; 
 	else if (strstr(e,"||")!= NULL) return 1;
 	else if (strstr(e,"&&")!= NULL) return 2;
+	else return 3;
 	}
-	else return 0;
+	return 0;
 }
 
 
