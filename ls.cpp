@@ -11,6 +11,7 @@
 #include <time.h>
 #include <pwd.h>
 #include <grp.h>
+#include <string.h>
 
 #define KBLU  "\x1B[34;1m"
 #define KGRN  "\x1B[32;1m"
@@ -21,8 +22,8 @@
 using namespace std;
 
 int flag_a = 0;
-int flag_l = 0;
 int flag_R = 0;
+int flag_l = 0;
 /*
  *  * This is a BARE BONES example of how to use opendir/readdir/closedir.  Notice
  *   * that there is no error checking on these functions.  You MUST add error 
@@ -40,7 +41,16 @@ void print_user(uid_t uid);
 int main(int argc,char *argv[] )
 {
 	get_options(argc, argv);
-	list(argv[optind]);
+	int i = optind;
+	if (argv[1] == NULL)
+		list(argv[1]);
+	else {
+		while(argv[i] != NULL){
+		list(argv[i]);
+		printf("\n");
+		i++;
+		}
+	}
 	return 0;
 }
 
@@ -139,11 +149,6 @@ int list(char *path)
 	else{
 		printf("Cannot be listed.");
 	}
-//	cout << direntp->d_name << endl; 
-//	i = stat(direntp->d_name, &mystat);
-//	printf("%i" ,(int)mystat.st_size);
-	    
-	    // use stat here to find attributes of file	
 
 }
 
@@ -169,8 +174,9 @@ void print(struct stat mystat, char*name){
 		if (mystat.st_mode & S_IXOTH){
 			printf(KGRN "%s  " RESET, name);
 		}
-		else 
+		else {
 			printf("%s  " , name);
+		}
 	}
 }
 
@@ -224,8 +230,9 @@ void print_l(struct stat mystat, char*name){
 		if (mystat.st_mode & S_IXOTH){
 			printf(KGRN "%s\n" RESET, name);
 		}
-		else 
+		else{ 
 			printf("%s\n" , name);
+		}
 	}
 }
 
