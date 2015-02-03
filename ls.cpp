@@ -36,21 +36,22 @@ void print_l(struct stat mystat, char * name);
 void print_group(gid_t gid);
 void print_perm(struct stat st,int perm);
 void print_user(uid_t uid);
-
+void show(struct dirent * direntp, DIR * dirp);
 
 int main(int argc,char *argv[] )
 {
 	get_options(argc, argv);
 	int i = optind;
-	if (argv[1] == NULL)
-		list(argv[1]);
+	if (argv[i] == NULL)
+		list(argv[i]);
 	else {
 		while(argv[i] != NULL){
-		list(argv[i]);
-		printf("\n");
-		i++;
+	     	list(argv[i]);
+	    	printf("\n");
+		    i++;
 		}
-	}
+	}	char time[64];
+
 	return 0;
 }
 
@@ -85,22 +86,19 @@ int list(char *path)
 {
 	char temp[100];
 	char *dirName;
-	struct stat mystat, st;
+	struct stat mystat;
 	DIR *dirp;
 	struct dirent *direntp;	
-	char time[64];
+	dirName = path;
+
 	if (path == NULL){
 		path = temp;
 		getcwd(path, 100);
 		dirName = path;
 	}
-
-	dirName = path;
-
 	if (stat(path, &mystat)){
 		perror("file not found");
 	}
-
 	if(S_ISREG(mystat.st_mode)){
 		print(mystat,path);
 		return 0;
@@ -109,43 +107,9 @@ int list(char *path)
 		if((dirp = opendir(dirName)) == NULL){
 			perror("open error");
 			exit(1);
-		}
-
-		do{
-			errno= 0;
-			if((direntp = readdir(dirp)) != NULL){
-			 	if((strcmp(direntp->d_name, ".") == 0)
-				  || (strcmp(direntp->d_name, "..") == 0)
-				  || (direntp->d_name[0] == '.')){
-				 	if(flag_a == 0)
-				  		continue;
-				}
-				if((stat(direntp->d_name, &st)) == -1)
-					perror("stat error");
-				if(flag_l == 0)
-					print(st ,direntp->d_name);
-				if(flag_l == 1){
-					print_perm(st,st.st_mode);
-					printf(" %d ",(int)st.st_nlink);
-					print_user(st.st_uid);
-					printf(" ");
-				    print_group(st.st_gid);
-					printf("%5li  ", (long) st.st_size);
-					strftime(time, sizeof(time), "%Y-%m-%d %H:%M",localtime(&st.st_mtime));
-					printf("%s ", time);
-					print_l(st, direntp->d_name);
-				}
-			}
-		}while(direntp != NULL); 
-		
-		if (errno != 0){
-			perror("read error");
-			exit(1);
-		}
-		if ((closedir(dirp)) == -1)
-			perror("close error");
+     	}
+		show(direntp, dirp);			 	
 	}
-
 	else{
 		printf("Cannot be listed.");
 	}
@@ -236,4 +200,42 @@ void print_l(struct stat mystat, char*name){
 	}
 }
 
+void show(struct dirent* direntp, DIR * dirp)
+{
+	struct stat st;
+	char time[64];
+	do{
+		errno= 0;
+		if((direntp = readdir(dirp)) != NULL){
+			if((strcmp(direntp->d_name, ".") == 0)
+			  || (strcmp(direntp->d_name, "..") == 0)
+			  || (direntp->d_name[0] == '.')){
+				if(flag_a == 0)
+					continue;
+			}
+			if((stat(direntp->d_name, &st)) == -1)
+				perror("stat error");
+			if(flag_l == 0)
+				print(st ,direntp->d_name);
+			if(flag_l == 1){
+				print_perm(st,st.st_mode);
+				printf(" %d ",(int)st.st_nlink);
+				print_user(st.st_uid);
+				printf(" ");
+				  print_group(st.st_gid);
+				printf("%5li  ", (long) st.st_size);
+				strftime(time, sizeof(time), "%Y-%m-%d %H:%M", localtime(&st.st_mtime));
+				printf("%s ", time);
+				print_l(st, direntp->d_name);
+			}
+		}
+	}while(direntp != NULL); 
+		
+	if (errno != 0){
+		perror("read error");
+		exit(1);
+	}
+	if ((closedir(dirp)) == -1)
+		perror("close error");
 
+}
