@@ -37,6 +37,14 @@ void print_group(gid_t gid);
 void print_perm(struct stat st,int perm);
 void print_user(uid_t uid);
 void show(struct dirent * direntp, DIR * dirp);
+void enq(char *);
+void deq();
+char* retDir();
+struct node {
+	char path[512];
+	struct node *next;
+} *front, *rear, *temp, *front1;
+
 
 int main(int argc,char *argv[] )
 {
@@ -47,7 +55,7 @@ int main(int argc,char *argv[] )
 	else {
 		while(argv[i] != NULL){
 	     	list(argv[i]);
-	    	printf("\n");
+	    //	printf("\n");
 		    i++;
 		}
 	}	char time[64];
@@ -85,33 +93,43 @@ void get_options(int argc, char *argv[])
 int list(char *path)
 {
 	char temp[100];
-	char *dirName;
+	char *dirName = path;
 	struct stat mystat;
 	DIR *dirp;
 	struct dirent *direntp;	
-	dirName = path;
 
 	if (path == NULL){
 		path = temp;
 		getcwd(path, 100);
 		dirName = path;
 	}
+
 	if (stat(path, &mystat)){
 		perror("file not found");
 	}
 	if(S_ISREG(mystat.st_mode)){
+		printf("%s\n", path);
 		print(mystat,path);
 		return 0;
 	}
 	else if(S_ISDIR(mystat.st_mode)){
-		if((dirp = opendir(dirName)) == NULL){
-			perror("open error");
-			exit(1);
-     	}
-		show(direntp, dirp);			 	
-	}
-	else{
-		printf("Cannot be listed.");
+		front = (struct node *)malloc(sizeof(struct node));
+		strncpy(front->path,dirName,512);
+		rear = front;
+		while(front != NULL){
+
+			if((chdir(front->path)) != 0)
+					perror("chdir error");
+
+			if((dirp = opendir(front->path)) == NULL){
+				perror("open error");
+				exit(1);
+		 	}
+		 	if(flag_R == 1)
+				printf("%s\n",front->path);
+			show(direntp, dirp);
+			deq();
+		}
 	}
 
 }
@@ -162,14 +180,14 @@ void print_user(uid_t uid)
 {
 		struct passwd *p;
 		p = getpwuid(uid);
-		printf("%-8s", p->pw_name);
+		printf("%-6s", p->pw_name);
 }
 
 void print_group(gid_t gid)
 {
 		struct group *g;
 		g = getgrgid(gid);
-		printf("%-8s", g->gr_name);
+		printf("%-6s", g->gr_name);
 }
 
 void print_l(struct stat mystat, char*name){
@@ -204,38 +222,92 @@ void show(struct dirent* direntp, DIR * dirp)
 {
 	struct stat st;
 	char time[64];
-	do{
-		errno= 0;
-		if((direntp = readdir(dirp)) != NULL){
-			if((strcmp(direntp->d_name, ".") == 0)
-			  || (strcmp(direntp->d_name, "..") == 0)
-			  || (direntp->d_name[0] == '.')){
-				if(flag_a == 0)
-					continue;
-			}
-			if((stat(direntp->d_name, &st)) == -1)
-				perror("stat error");
-			if(flag_l == 0)
-				print(st ,direntp->d_name);
-			if(flag_l == 1){
-				print_perm(st,st.st_mode);
-				printf(" %d ",(int)st.st_nlink);
-				print_user(st.st_uid);
-				printf(" ");
-				  print_group(st.st_gid);
-				printf("%5li  ", (long) st.st_size);
-				strftime(time, sizeof(time), "%Y-%m-%d %H:%M", localtime(&st.st_mtime));
-				printf("%s ", time);
-				print_l(st, direntp->d_name);
-			}
+
+	while((direntp = readdir(dirp)) != NULL){
+		if((stat(direntp->d_name, &st)) == -1)
+			perror("stat error");
+
+		if((strcmp(direntp->d_name, ".") == 0)
+		  || (strcmp(direntp->d_name, "..") == 0)
+		  || (direntp->d_name[0] == '.')){
+			if(flag_a == 0)
+				continue;
 		}
-	}while(direntp != NULL); 
-		
-	if (errno != 0){
-		perror("read error");
-		exit(1);
+		if(flag_R == 1){
+			if((strcmp(direntp->d_name, ".") != 0)
+		      && (strcmp(direntp->d_name, "..") != 0)){
+		      	if(S_ISDIR(st.st_mode)){
+		      		char buf[512];
+		      		size_t size=512;
+		      		getcwd(buf, size);
+					strcat(buf,"/");
+		      		strcat(buf,direntp->d_name);
+		      		enq(buf);
+		      	}
+		    }
+		}
+		if(flag_l == 0)
+			print(st ,direntp->d_name);
+		if(flag_l == 1){
+			print_perm(st,st.st_mode);
+			printf(" %4d ",(int)st.st_nlink);
+			print_user(st.st_uid);
+			printf(" ");
+			print_group(st.st_gid);
+			printf("%8li  ", (long) st.st_size);
+			strftime(time, sizeof(time), "%Y-%m-%d %H:%M", localtime(&st.st_mtime));
+			printf("%s ", time);
+			print_l(st, direntp->d_name);
+		}
 	}
+	
 	if ((closedir(dirp)) == -1)
 		perror("close error");
+	printf("\n");
+	printf("\n");
+
 
 }
+
+void enq(char *path)
+{
+
+	    temp=(struct node *)malloc(1*sizeof(struct node));
+	    rear->next = temp;
+	    strncpy(temp->path,path,512);
+	    temp->next = NULL;
+	    rear = temp;
+	    
+}
+
+void deq()
+{
+	front1 = front;
+	if (front1 == NULL){
+	   // printf("\n Error: Trying to display elements from empty queue");
+	    return;
+	}
+	else
+	    if (front1->next != NULL){
+	    	front1 = front1->next;
+	    //	printf("\n Dequed value : %d", front->info);
+	        free(front);
+	        front = front1;
+	     }                              
+         else{
+	         //printf("\n Dequed value : %d", front->info);	         
+	         free(front);
+	         front = NULL;	         	     	 
+	     	 rear = NULL;	         	     	 
+	     }    	     	 
+}
+
+char * frontelement()
+{
+	if ((front != NULL) && (rear != NULL))
+	    return(front->path);
+	else
+	    return NULL;
+}
+
+
