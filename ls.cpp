@@ -48,14 +48,20 @@ struct node {
 
 int main(int argc,char *argv[] )
 {
+		char buf[512];
+			size_t t= 512;
+			if((getcwd(buf,t))==NULL)
+				perror("getcwd error");
+
 	get_options(argc, argv);
 	int i = optind;
 	if (argv[i] == NULL)
 		list(argv[i]);
 	else {
 		while(argv[i] != NULL){
-	     	list(argv[i]);
-	    //	printf("\n");
+		     	list(argv[i]);
+			if((chdir(buf)) == -1)
+				perror("chdir error");
 		    i++;
 		}
 	}	char time[64];
@@ -100,7 +106,8 @@ int list(char *path)
 
 	if (path == NULL){
 		path = temp;
-		getcwd(path, 100);
+		if((getcwd(path, 100)) == NULL)
+			perror("getcwd error");
 		dirName = path;
 	}
 
@@ -239,7 +246,8 @@ void show(struct dirent* direntp, DIR * dirp)
 		      	if(S_ISDIR(st.st_mode)){
 		      		char buf[512];
 		      		size_t size=512;
-		      		getcwd(buf, size);
+		      		if((getcwd(buf, size)) == NULL)
+		      			perror("getcwd error");
 					strcat(buf,"/");
 		      		strcat(buf,direntp->d_name);
 		      		enq(buf);
