@@ -36,7 +36,7 @@ void print_l(struct stat mystat, char * name);
 void print_group(gid_t gid);
 void print_perm(struct stat st,int perm);
 void print_user(uid_t uid);
-void show(struct dirent * direntp, DIR * dirp);
+void show( DIR * dirp);
 void enq(char *);
 void deq();
 char* retDir();
@@ -64,7 +64,7 @@ int main(int argc,char *argv[] )
 				perror("chdir error");
 		    i++;
 		}
-	}	char time[64];
+	}
 
 	return 0;
 }
@@ -102,7 +102,6 @@ int list(char *path)
 	char *dirName = path;
 	struct stat mystat;
 	DIR *dirp;
-	struct dirent *direntp;	
 
 	if (path == NULL){
 		path = temp;
@@ -134,11 +133,11 @@ int list(char *path)
 		 	}
 		 	if(flag_R == 1)
 				printf("%s\n",front->path);
-			show(direntp, dirp);
+			show(dirp);
 			deq();
 		}
 	}
-
+	return 0;
 }
 
 void print(struct stat mystat, char*name){
@@ -225,8 +224,10 @@ void print_l(struct stat mystat, char*name){
 	}
 }
 
-void show(struct dirent* direntp, DIR * dirp)
+void show( DIR * dirp)
 {
+
+	struct dirent *direntp;	
 	struct stat st;
 	char time[64];
 
