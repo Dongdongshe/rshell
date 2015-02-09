@@ -32,6 +32,7 @@ int flag_l = 0;
 void get_options(int argc, char* argv[]);
 int list(char *path);
 void print(struct stat mystat, char * name);
+void print_file(struct stat, char *);
 void print_l(struct stat mystat, char * name);
 void print_group(gid_t gid);
 void print_perm(struct stat st,int perm);
@@ -48,10 +49,10 @@ struct node {
 
 int main(int argc,char *argv[] )
 {
-		char buf[512];
-			size_t t= 512;
-			if((getcwd(buf,t))==NULL)
-				perror("getcwd error");
+	char buf[512];
+	size_t t= 512;
+	if((getcwd(buf,t))==NULL)
+		perror("getcwd error");
 
 	get_options(argc, argv);
 	int i = optind;
@@ -59,7 +60,7 @@ int main(int argc,char *argv[] )
 		list(argv[i]);
 	else {
 		while(argv[i] != NULL){
-		     	list(argv[i]);
+		    list(argv[i]);
 			if((chdir(buf)) == -1)
 				perror("chdir error");
 		    i++;
@@ -114,18 +115,22 @@ int list(char *path)
 		perror("file not found");
 	}
 	if(S_ISREG(mystat.st_mode)){
-		printf("%s\n", path);
-		print(mystat,path);
+		print_file(mystat,path);
 		return 0;
 	}
 	else if(S_ISDIR(mystat.st_mode)){
+		front = NULL;
+		rear = NULL;
 		front = (struct node *)malloc(sizeof(struct node));
 		strncpy(front->path,dirName,512);
+		front->next = NULL;
 		rear = front;
 		while(front != NULL){
 
-			if((chdir(front->path)) != 0)
+			if(flag_R == 1){
+				if((chdir(front->path)) != 0)
 					perror("chdir error");
+			}
 
 			if((dirp = opendir(front->path)) == NULL){
 				perror("open error");
@@ -231,11 +236,13 @@ void show( DIR * dirp)
 	struct stat st;
 	char time[64];
 
-	while((direntp = readdir(dirp)) != NULL){
-		if((stat(direntp->d_name, &st)) == -1)
-			perror("stat error");
+while((direntp = readdir(dirp)) != NULL){
+	if((stat(direntp->d_name, &st)) == -1){
+		perror("stat error");
+		exit(1);
+	}
 
-		if((strcmp(direntp->d_name, ".") == 0)
+	if((strcmp(direntp->d_name, ".") == 0)
 		  || (strcmp(direntp->d_name, "..") == 0)
 		  || (direntp->d_name[0] == '.')){
 			if(flag_a == 0)
@@ -319,4 +326,17 @@ char * frontelement()
 	    return NULL;
 }
 
-
+void print_file(struct stat mystat, char*name){
+	
+	if(S_ISDIR(mystat.st_mode)){
+	 printf(KBLU "%s  " RESET, name);
+	}
+	else if(S_ISREG(mystat.st_mode)){
+		if (mystat.st_mode & S_IXOTH){
+			printf(KGRN "%s  " RESET, name);
+		}
+		else {
+			printf("%s  " , name);
+		}
+	}
+}
