@@ -5,7 +5,7 @@
 #include <sys/wait.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-static int run(char * cmd[], char *args[], int i);
+static int run(char * cmd, char *args[]);
 void clean(char *args[]);
 
 void execute(char ** args, int flag, char * dup);
@@ -29,7 +29,7 @@ while(1)
         if(!fgets(line, 1024, stdin))       
         	return 0;
 		char * cut = line;            
-		int flag = 0;
+		int flag[64];
 		char input[1024];
 
 		cut = strtok(line, "#");   //cut off characters following #
@@ -37,21 +37,33 @@ while(1)
 		char* next = strtok_r(cut, ";|&", &save); //devide input into commands
 		int ret = 0;		
 		int i = 0;
-		char* cmd[1024];
-		while(next != 0) {     // get arguments of each commands
-			cmd[i] = next;
-			char* begin = next;
-	        
-	        switch (flag) //run next command based on operator and return 
+		char cmd[64][1024];
+	//	char* cmd[1024];
+	    while(next != 0) {
+	    	strncpy(cmd[i],next,1024);
+	    	char *begin = next;
+			next = strtok_r(NULL, ";|&", &save);
+			char *end = next;
+			flag[i] = ope(cut, begin, end, input); //detect operator
+			i++;
+		}
+		int j;
+		int n = i;
+		i = 0;
+		for(j=0;j < n;j++) {    
+		//	cmd[i] = next;
+	//		char* begin = next;
+			char * execu= cmd[i];
+	        switch (flag[i]) //run next command based on operator and return
 		    {             //of former command
 				case(0):  // case of ;
-					ret = run(cmd, args, i);
+					ret = run(execu, args);
 					break;
 				case(1): // case of ||
-					if (ret == 1)  ret = run(cmd, args, i);
+					if (ret == 1)  ret = run(execu, args);
 					break;
 				case(2):// case of &&
-					if (ret == 0)  ret = run(cmd, args,i);
+					if (ret == 0)  ret = run(execu, args);
 				case(3): // case of the others
 					printf("wrong operator");
 					break;
@@ -59,16 +71,16 @@ while(1)
 	
 			clean(args);  //clean arguments 
 			i++;
-			next = strtok_r(NULL, ";|&", &save);
-			char *end = next;
-			flag = ope(cut, begin, end, input); //detect operator
+//			next = strtok_r(NULL, ";|&", &save);
+//			char *end = next;
+//			flag[i] = ope(cut, begin, end, input); //detect operator
 		}
 
 	}
 	return 0;
 }
 
-static int run(char *cmd[], char *args[], int i) // execute command
+static int run(char *execu, char *args[]) // execute command
 { 
 	int status;
 	char * dup;
@@ -77,29 +89,29 @@ static int run(char *cmd[], char *args[], int i) // execute command
 	char buf[1024];
 	int flag;
 
-	if (strstr(cmd[i], "<<<")!= NULL)
+	if (strstr(execu, "<<<")!= NULL)
 		flag = 4;
-	else if (strstr(cmd[i], ">>")!= NULL)
+	else if (strstr(execu, ">>")!= NULL)
 		flag = 3;	
-	else if (strstr(cmd[i], "1>")!= NULL)
+	else if (strstr(execu, "1>")!= NULL)
 		flag = 5;
-	else if (strstr(cmd[i], "<")!= NULL)
+	else if (strstr(execu, "<")!= NULL)
 		flag = 1;
-	else if (strstr(cmd[i], "2>")!= NULL)
+	else if (strstr(execu, "2>")!= NULL)
 		flag = 6;
-	else if (strstr(cmd[i], ">")!= NULL)
+	else if (strstr(execu, ">")!= NULL)
 		flag = 2;
 	else 
 		flag = 0;
-	cmd[i] = strtok(cmd[i], "<12>");
+	execu = strtok(execu, "<12>");
 	dup = strtok(NULL, "<12>");
 	dup = strtok(dup, " \n");
-	cmd[i] = strtok_r(cmd[i], " \n", &save);
+	execu = strtok_r(execu, " \n", &save);
     int a = 0;
-	while (cmd[i] != NULL){
-		args[a] = cmd[i];
+	while (execu != NULL){
+		args[a] = execu;
 		++a;
-		cmd[i] = strtok_r(NULL, " \n", &save);
+		execu = strtok_r(NULL, " \n", &save);
 	}
 		
 	if (strcmp(args[0], "exit") == 0)  //inner exit command
@@ -159,7 +171,7 @@ void execute(char ** args, int flag, char * dup)
 		case 4:
 			int t;
 			t = strlen(dup);
-			strncpy(buf, dup+1,t-3);
+			strncpy(buf, dup,t-1);
 			in  = creat("temp.txt", S_IRUSR|S_IWUSR);
 			write(in, buf, t-3);
 			close(in);
@@ -210,6 +222,7 @@ int ope(char *cut, char * a , char * b, char* c){
 	}
 	return 0;
 }
+
 
 
 
