@@ -125,7 +125,7 @@ int list(char *path)
 		strncpy(front->path,dirName,512);
 		front->next = NULL;
 		rear = front;
-		while(front != NULL){
+		while(front->path != NULL){
 
 			if(flag_R == 1){
 				if((chdir(front->path)) != 0)
