@@ -5,7 +5,7 @@
 #include <sys/wait.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-static int run(char * cmd, char *args[]);
+static int run(char *);
 void clean(char *args[]);
 
 void execute(char ** args, int flag, char * dup);
@@ -13,7 +13,6 @@ int ope(char * cut, char * a, char * b, char* c);
 int main(int argc, char **argv, char **envp)
 {
 char line[1024]; 
-char *args[1024];
 char host[100];
 char *user;
 char *save;
@@ -38,7 +37,6 @@ while(1)
 		int ret = 0;		
 		int i = 0;
 		char cmd[64][1024];
-	//	char* cmd[1024];
 	    while(next != 0) {
 	    	strncpy(cmd[i],next,1024);
 	    	char *begin = next;
@@ -51,36 +49,30 @@ while(1)
 		int n = i;
 		i = 0;
 		for(j=0;j < n;j++) {    
-		//	cmd[i] = next;
-	//		char* begin = next;
 			char * execu= cmd[i];
 	        switch (flag[i]) //run next command based on operator and return
 		    {             //of former command
 				case(0):  // case of ;
-					ret = run(execu, args);
+					ret = run(execu);
 					break;
 				case(1): // case of ||
-					if (ret == 1)  ret = run(execu, args);
+					if (ret == 1)  ret = run(execu);
 					break;
 				case(2):// case of &&
-					if (ret == 0)  ret = run(execu, args);
+					if (ret == 0)  ret = run(execu);
 				case(3): // case of the others
 					printf("wrong operator");
 					break;
 			}		
 	
-			clean(args);  //clean arguments 
 			i++;
-//			next = strtok_r(NULL, ";|&", &save);
-//			char *end = next;
-//			flag[i] = ope(cut, begin, end, input); //detect operator
 		}
 
 	}
 	return 0;
 }
 
-static int run(char *execu, char *args[]) // execute command
+static int run(char *execu) // execute command
 { 
 	int status;
 	char * dup;
@@ -88,6 +80,7 @@ static int run(char *execu, char *args[]) // execute command
 	const char *e;
 	char buf[1024];
 	int flag;
+	char *args[1024];
 
 	if (strstr(execu, "<<<")!= NULL)
 		flag = 4;
@@ -124,9 +117,8 @@ static int run(char *execu, char *args[]) // execute command
 		}			
 		else if (pid == 0)
 		{
-			execute(args, flag, dup);
-	//		if (execvp(args[0], args) != 0)
-	//			printf("Command not found");
+			execute(args, flag, dup);	
+			clean(args);  //clean arguments 
 			exit(1);											
 		}
 		else {
@@ -211,12 +203,11 @@ void clean(char *args[])
 int ope(char *cut, char * a , char * b, char* c){
 	char *d = c;
 	char e[1024];
-//	d= d + (a - cut);   
     if(b!= NULL) {
 	strncpy(e,d, b-a);  //get operator from input
 	if (strstr(e, ";") !=NULL) return 0; 
+	else if (strstr(e,"|")!= NULL) return 4;
 	else if (strstr(e,"||")!= NULL) return 1;
-	else if (strstr(e,"|")!= NULL) return 1;
 	else if (strstr(e,"&&")!= NULL) return 2;
 	else return 3;
 	}
