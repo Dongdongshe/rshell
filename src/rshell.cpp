@@ -217,7 +217,7 @@ int ope(char *cut, char * a , char * b, char* c){
 	char e[1024];
     if(b!= NULL) {
 	strncpy(e,d, b-a);  //get operator from input
-	e[b-a-1] = '\0';
+	e[b-a] = '\0';
 	if (strstr(e, ";") !=NULL) return 0; 
 	else if (strstr(e,"||")!= NULL) return 1;
 	else if (strstr(e,"|")!= NULL) return 4;
@@ -276,7 +276,6 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 			savestdin = dup(0);
 		}
 		int pid = fork();
-	//	p[i]=pid;
 		if(pid == -1){
 			perror("fork error");
 			exit(1);
@@ -285,13 +284,11 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 		{
 			if(i != 0){
 				dup2(pp[PIPE_READ], 0);
-			//	close(pp[PIPE_READ]);
 				close(pp[PIPE_WRITE]);
 		    }
 			if(m == 4){
 				dup2(fd[PIPE_WRITE],1);
 				close(fd[PIPE_READ]);
-			//	close(fd[PIPE_WRITE]);
 			}
 			execute(args, flag, dupchar);
 			clean(args);  //clean arguments 
