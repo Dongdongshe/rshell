@@ -6,20 +6,24 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 static int run(char *);
+int run_pipe(char cmd[64][1024],int i, int pp[2]);
 void clean(char *args[]);
-
-void execute(char ** args, int flag, char * dup);
+int ret = 0;
+int num  = 0;
+int flag[64];
+int p[64];
+int savestdin;
+void execute(char ** args, int flag, char * dup3);
 int ope(char * cut, char * a, char * b, char* c);
 int main(int argc, char **argv, char **envp)
 {
-char line[1024]; 
-char host[100];
-char *user;
-char *save;
 
-
-while(1)
-	{
+	char line[1024]; 
+	char host[100];
+	char *user;
+	char *save;
+	
+	while(1){
 		user = getlogin();    //get user name
 		gethostname(host, 100);    //get os name
 		printf("%s@%s>>", user, host);	        //print machine info
@@ -28,13 +32,11 @@ while(1)
         if(!fgets(line, 1024, stdin))       
         	return 0;
 		char * cut = line;            
-		int flag[64];
 		char input[1024];
 
 		cut = strtok(line, "#");   //cut off characters following #
 	    strncpy(input, cut, strlen(cut));   //save the input to a array		
 		char* next = strtok_r(cut, ";|&", &save); //devide input into commands
-		int ret = 0;		
 		int i = 0;
 		char cmd[64][1024];
 	    while(next != 0) {
@@ -47,38 +49,48 @@ while(1)
 		}
 		int j;
 		int n = i;
+		num  = n;
 		i = 0;
-		for(j=0;j < n;j++) {    
-			char * execu= cmd[i];
-	        switch (flag[i]) //run next command based on operator and return
-		    {             //of former command
-				case(0):  // case of ;
-					ret = run(execu);
-					break;
-				case(1): // case of ||
-					if (ret == 1)  ret = run(execu);
-					break;
-				case(2):// case of &&
-					if (ret == 0)  ret = run(execu);
-				case(3): // case of the others
-					printf("wrong operator");
-					break;
-			}		
-	
-			i++;
+		int pp[2];
+		if (flag[0] == 4){
+			run_pipe(cmd,i,pp);
+			dup2(savestdin,0);
 		}
-
+		else {
+		for(j=0;j < n;j++) {    
+			char * execu= cmd[j];
+			if (j==0)
+				ret = run(execu);
+			else{				
+				switch (flag[j-1]) //run next command based on ope
+			    {             //of former command
+					case(0):  // case of ;
+						ret = run(execu);
+						break;
+					case(1): // case of ||
+						if (ret == 1){
+							ret = run(execu);
+						}
+						break;
+					case(2):// case of &&
+						if (ret == 0){
+							ret = run(execu);
+						}
+					case(3): // case of the others
+						printf("wrong operator");
+						break;
+				}		
+			}
+		}
+		}
 	}
 	return 0;
 }
 
-static int run(char *execu) // execute command
-{ 
+static int run(char *execu){ 
 	int status;
-	char * dup;
+	char * dupchar;
 	char *save;
-	const char *e;
-	char buf[1024];
 	int flag;
 	char *args[1024];
 
@@ -97,8 +109,8 @@ static int run(char *execu) // execute command
 	else 
 		flag = 0;
 	execu = strtok(execu, "<12>");
-	dup = strtok(NULL, "<12>");
-	dup = strtok(dup, " \n");
+	dupchar = strtok(NULL, "<12>");
+	dupchar = strtok(dupchar, " \n");
 	execu = strtok_r(execu, " \n", &save);
     int a = 0;
 	while (execu != NULL){
@@ -117,7 +129,7 @@ static int run(char *execu) // execute command
 		}			
 		else if (pid == 0)
 		{
-			execute(args, flag, dup);	
+			execute(args, flag, dupchar);	
 			clean(args);  //clean arguments 
 			exit(1);											
 		}
@@ -129,7 +141,7 @@ static int run(char *execu) // execute command
 	}
 }
 
-void execute(char ** args, int flag, char * dup)
+void execute(char ** args, int flag, char * dupchar) //execute different dup 
 {
 	int in,out;
 	char buf[1024];
@@ -140,21 +152,21 @@ void execute(char ** args, int flag, char * dup)
 				printf("Command not found");
 			break;
 		case 1:
-			in = open(dup, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
+			in = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
 			dup2(in, 0);
 			if (execvp(args[0], args) != 0)
 				printf("Command not found");
 			close(in);
 			break;
 		case 2:
-			out = open(dup, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
+			out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
 			dup2(out, 1);
 			if (execvp(args[0], args) != 0)
 				printf("Command not found");
 			close(out);
 			break;
 		case 3:	
-			out = open(dup, O_RDWR|O_APPEND, S_IRUSR|S_IWUSR);
+			out = open(dupchar, O_RDWR|O_APPEND, S_IRUSR|S_IWUSR);
 			dup2(out, 1);
 			if (execvp(args[0], args) != 0)
 				printf("Command not found");
@@ -162,8 +174,8 @@ void execute(char ** args, int flag, char * dup)
 			break;
 		case 4:
 			int t;
-			t = strlen(dup);
-			strncpy(buf, dup,t-1);
+			t = strlen(dupchar);
+			strncpy(buf, dupchar,t-1);
 			in  = creat("temp.txt", S_IRUSR|S_IWUSR);
 			write(in, buf, t-3);
 			close(in);
@@ -174,14 +186,14 @@ void execute(char ** args, int flag, char * dup)
 			close(in);
 			break;
 		case 5:
-			out = open(dup, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
+			out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
 			dup2(out, 1);
 			if (execvp(args[0], args) != 0)
 				printf("Command not found");
 			close(out);
 			break;
 		case 6:
-			out = open(dup, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
+			out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
 			dup2(out, 2);
 			if (execvp(args[0], args) != 0)
 				printf("Command not found");
@@ -205,15 +217,100 @@ int ope(char *cut, char * a , char * b, char* c){
 	char e[1024];
     if(b!= NULL) {
 	strncpy(e,d, b-a);  //get operator from input
+	e[b-a-1] = '\0';
 	if (strstr(e, ";") !=NULL) return 0; 
-	else if (strstr(e,"|")!= NULL) return 4;
 	else if (strstr(e,"||")!= NULL) return 1;
+	else if (strstr(e,"|")!= NULL) return 4;
 	else if (strstr(e,"&&")!= NULL) return 2;
 	else return 3;
 	}
 	return 0;
 }
 
+
+int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
+{
+	char * execu= cmd[i];
+	const int PIPE_READ = 0;
+	const int PIPE_WRITE = 1;
+	int fd[2];
+	int m = flag[i];
+	if (flag[i] == 4){
+		if (pipe(fd) == -1)
+			perror("pipe error");
+	}
+	char * dupchar;
+	char *save;
+	int flag;
+	int sa;
+	char *args[1024];
+
+	if (strstr(execu, "<<<")!= NULL)
+		flag = 4;
+	else if (strstr(execu, ">>")!= NULL)
+		flag = 3;	
+	else if (strstr(execu, "1>")!= NULL)
+		flag = 5;
+	else if (strstr(execu, "<")!= NULL)
+		flag = 1;
+	else if (strstr(execu, "2>")!= NULL)
+		flag = 6;
+	else if (strstr(execu, ">")!= NULL)
+		flag = 2;
+	else 
+		flag = 0;
+	execu = strtok(execu, "<12>");
+	dupchar = strtok(NULL, "<12>");
+	dupchar = strtok(dupchar, " \n");
+	execu = strtok_r(execu, " \n", &save);
+    int a = 0;
+	while (execu != NULL){
+		args[a] = execu;
+		++a;
+		execu = strtok_r(NULL, " \n", &save);
+	}	
+	if (strcmp(args[0], "exit") == 0)  //inner exit command
+		exit(0);
+	else{
+		if(i == 0){
+			savestdin = dup(0);
+		}
+		int pid = fork();
+	//	p[i]=pid;
+		if(pid == -1){
+			perror("fork error");
+			exit(1);
+		}			
+		else if (pid == 0)
+		{
+			if(i != 0){
+				dup2(pp[PIPE_READ], 0);
+			//	close(pp[PIPE_READ]);
+				close(pp[PIPE_WRITE]);
+		    }
+			if(m == 4){
+				dup2(fd[PIPE_WRITE],1);
+				close(fd[PIPE_READ]);
+			//	close(fd[PIPE_WRITE]);
+			}
+			execute(args, flag, dupchar);
+			clean(args);  //clean arguments 
+			exit(1);											
+		}
+		else if(pid > 0)
+		{
+			int y;
+			if ((y = wait(0)) == -1)
+				perror("wait error");
+			if(m == 4)
+				close(fd[PIPE_WRITE]);
+			i++;
+			if(i != num)
+				run_pipe(cmd,i,fd);
+		}
+	}
+	return 0;
+}
 
 
 
