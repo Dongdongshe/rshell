@@ -4,14 +4,9 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <sys/mman.h>
-<<<<<<< HEAD
-
-static int run(char * cmd[],  int i);
-=======
 #include <fcntl.h>
 static int run(char *);
 int run_pipe(char cmd[64][1024],int i, int pp[2]);
->>>>>>> redirect
 void clean(char *args[]);
 int ret = 0;
 int num  = 0;
@@ -22,14 +17,6 @@ void execute(char ** args, int flag, char * dup3);
 int ope(char * cut, char * a, char * b, char* c);
 int main(int argc, char **argv, char **envp)
 {
-<<<<<<< HEAD
-char line[1024]; 
-char host[100];
-char *user;
-char *save;
-
-=======
->>>>>>> redirect
 
 	char line[1024]; 
 	char host[100];
@@ -51,35 +38,10 @@ char *save;
 	    strncpy(input, cut, strlen(cut));   //save the input to a array		
 		char* next = strtok_r(cut, ";|&", &save); //devide input into commands
 		int i = 0;
-<<<<<<< HEAD
-		char *cmd[1024];
-
-		while(next != 0) {     // get arguments of each commands
-			cmd[i] = next;
-			char* begin = next;
-	        
-	        switch (flag) //run next command based on operator and return 
-		    {             //of former command
-				case(0):  // case of ;
-					ret = run(cmd, i);
-					break;
-				case(1): // case of ||
-					if (ret == 1)  ret = run(cmd, i);
-					break;
-				case(2):// case of &&
-					if (ret == 0)  ret = run(cmd, i);
-				case(3): // case of the others
-					printf("wrong operator");
-					break;
-			}		
-	
-			i++;
-=======
 		char cmd[64][1024];
 	    while(next != 0) {
 	    	strncpy(cmd[i],next,1024);
 	    	char *begin = next;
->>>>>>> redirect
 			next = strtok_r(NULL, ";|&", &save);
 			char *end = next;
 			flag[i] = ope(cut, begin, end, input); //detect operator
@@ -125,13 +87,6 @@ char *save;
 	return 0;
 }
 
-<<<<<<< HEAD
-static int run(char *cmd[], int i) // execute command
-{ 
-	int status;
-	char *args[1024];
-	cmd[i] = strtok(cmd[i], " \n");
-=======
 static int run(char *execu){ 
 	int status;
 	char * dupchar;
@@ -157,49 +112,23 @@ static int run(char *execu){
 	dupchar = strtok(NULL, "<12>");
 	dupchar = strtok(dupchar, " \n");
 	execu = strtok_r(execu, " \n", &save);
->>>>>>> redirect
     int a = 0;
 	while (execu != NULL){
 		args[a] = execu;
 		++a;
-<<<<<<< HEAD
-		cmd[i] = strtok(NULL, " \n");
-=======
 		execu = strtok_r(NULL, " \n", &save);
->>>>>>> redirect
 	}
 		
 	if (strcmp(args[0], "exit") == 0)  //inner exit command
 		exit(0);
-<<<<<<< HEAD
-	else
-	{
-		int pid = fork();
-		if(pid == -1){
-			perror("sdf");
-=======
 	else{
 		int pid = fork();
 		if(pid == -1){
 			perror("fork error");
->>>>>>> redirect
 			exit(1);
 		}			
 		else if (pid == 0)
 		{
-<<<<<<< HEAD
-			if (execvp(args[0], args) != 0)
-				printf("Command not found");
-			clean(args);  //clean arguments 
-		    exit(1);											
-		}
-
-		else {
-		 	if( wait(&status) == -1)  //save the child process exit value
-				perror("error");      // to statue and return it to parent 
-		    return WEXITSTATUS(status);	//process    
-	    }	    
-=======
 			execute(args, flag, dupchar);	
 			clean(args);  //clean arguments 
 			exit(1);											
@@ -270,7 +199,6 @@ void execute(char ** args, int flag, char * dupchar) //execute different dup
 				printf("Command not found");
 			close(out);
 			break;
->>>>>>> redirect
 	}
 }
 
@@ -291,7 +219,6 @@ int ope(char *cut, char * a , char * b, char* c){
 	strncpy(e,d, b-a);  //get operator from input
 	e[b-a-1] = '\0';
 	if (strstr(e, ";") !=NULL) return 0; 
-	else if(strstr(e, "|")!= NULL) return 4;
 	else if (strstr(e,"||")!= NULL) return 1;
 	else if (strstr(e,"|")!= NULL) return 4;
 	else if (strstr(e,"&&")!= NULL) return 2;
@@ -299,50 +226,7 @@ int ope(char *cut, char * a , char * b, char* c){
 	}
 	return 0;
 }
-/*
-int run_pipe(char *cmd[], int i)
-{
-	const int PIPE_READ = 0;
-	const int PIPE_WRITE = 1;
-	int fd[2];
-	if (ret == 4){
-		if(pipe(fd) == -1)
-			perror("pipe error");
-	}
 
-	char *args[1024];
-	cmd[i] = strtok(cmd[i], " \n");
-    int a = 0;
-	while (cmd[i] != NULL){
-		args[a] = cmd[i];
-		++a;
-		cmd[i] = strtok(NULL, " \n");
-	}
-	
-	if (strcmp(args[0], "exit") == 0)  //inner exit command
-		exit(0);
-	else
-	{
-		int pid = frok();
-		if(pid == -1){
-			perror("fork error");
-			exit(1);
-		}
-		else if(pid == 0)
-		{
-			printf("first child\n");
-			dup2(fd[PIPE_WRITE],1);
-			close(fd[PIPE_READ]);
-			if (execvp(args[0], args) != 0)
-				printf("Command not found");
-			i++;
-			clean(args);  //clean arguments 
-		    exit(1);											
-		}
-
-		else if(pid > 0)
-		{
-			int pid2 = fork();*/
 
 int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 {
