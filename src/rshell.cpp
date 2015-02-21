@@ -24,8 +24,10 @@ int main(int argc, char **argv, char **envp)
 	char *save;
 	
 	while(1){
-		user = getlogin();    //get user name
-		gethostname(host, 100);    //get os name
+		if(NULL == (user = getlogin()))
+			perror("getlogin");    //get user name
+		if (-1 == (gethostname(host, 100)))
+			perror("gethostname");    //get os name
 		printf("%s@%s>>", user, host);	        //print machine info
         fflush(NULL);
 
@@ -54,7 +56,8 @@ int main(int argc, char **argv, char **envp)
 		int pp[2];
 		if (flag[0] == 4){
 			run_pipe(cmd,i,pp);
-			dup2(savestdin,0);
+			if (-1 == dup2(savestdin,0))
+				perror("dup2 error");
 		}
 		else {
 		for(j=0;j < n;j++) {    
@@ -149,55 +152,76 @@ void execute(char ** args, int flag, char * dupchar) //execute different dup
 	{
 		case 0:
 			if (execvp(args[0], args) != 0)
-				printf("Command not found");
+				perror("Command not found");
 			break;
 		case 1:
-			in = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
-			dup2(in, 0);
+			if(-1 ==(in = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)))
+				perror("open error");
+			if(-1 ==dup2(in, 0))
+				perror("dup error");
 			if (execvp(args[0], args) != 0)
-				printf("Command not found");
-			close(in);
+				perror("Command not found");
+			if (-1==close(in))
+				perror("close error");
 			break;
 		case 2:
-			out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
-			dup2(out, 1);
+			if (-1 == (out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)))
+				perror("open error");
+			if (-1 ==dup2(out, 1))
+				perror("dup error");
 			if (execvp(args[0], args) != 0)
-				printf("Command not found");
-			close(out);
+				perror("Command not found");
+			if (-1 == close(out))
+				perror("close error");
 			break;
 		case 3:	
-			out = open(dupchar, O_RDWR|O_APPEND, S_IRUSR|S_IWUSR);
-			dup2(out, 1);
+			if (-1 == (out = open(dupchar, O_RDWR|O_APPEND, S_IRUSR|S_IWUSR)))
+				perror("open error");
+			if(-1 ==dup2(out, 1))
+				perror("asdf");
 			if (execvp(args[0], args) != 0)
-				printf("Command not found");
-			close(out);
+				perror("Command not found");
+			if(-1 == close(out))
+				perror("close error");
 			break;
 		case 4:
 			int t;
 			t = strlen(dupchar);
 			strncpy(buf, dupchar,t-1);
-			in  = creat("temp.txt", S_IRUSR|S_IWUSR);
-			write(in, buf, t-3);
-			close(in);
-			in = open("temp.txt", O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
-			dup2(in, 0);
+			if (-1 == (in  = creat("temp.txt", S_IRUSR|S_IWUSR)))
+				perror("cadsfasdf");
+			if (-1 == write(in, buf, t-3))
+				perror("adadsf");
+			if (-1 ==close(in))
+				perror("close error");
+			if (-1 ==(in = open("temp.txt", O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)))
+				perror("asdfads");
+			if (-1 == dup2(in, 0))
+				perror("asdfasdf");
 			if (execvp(args[0], args) != 0)
-				printf("Command not found");
-			close(in);
+				perror("Command not found");
+			if (-1 == close(in))
+				perror("adfasd");
 			break;
 		case 5:
-			out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
-			dup2(out, 1);
+			if (-1 == (out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)))
+				perror("asdfasdf");
+			if(-1 == dup2(out, 1))
+				perror("adsfads");
 			if (execvp(args[0], args) != 0)
-				printf("Command not found");
-			close(out);
+				perror("Command not found");
+			if (-1 == close(out))
+				perror("asdfasdf");
 			break;
 		case 6:
-			out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
-			dup2(out, 2);
+			if (-1 == (out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)))
+				perror("adsfadsf");
+			if (-1 == dup2(out, 2))
+				perror("asdfadsf");
 			if (execvp(args[0], args) != 0)
-				printf("Command not found");
-			close(out);
+				perror("Command not found");
+			if (-1 == close(out))
+				perror("adfadsf");
 			break;
 	}
 }
@@ -273,7 +297,8 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 		exit(0);
 	else{
 		if(i == 0){
-			savestdin = dup(0);
+			if (-1 == (savestdin = dup(0)))
+				perror("adfadf");
 		}
 		int pid = fork();
 		if(pid == -1){
@@ -283,12 +308,16 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 		else if (pid == 0)
 		{
 			if(i != 0){
-				dup2(pp[PIPE_READ], 0);
-				close(pp[PIPE_WRITE]);
+				if (-1 == dup2(pp[PIPE_READ], 0))
+					perror("asdfadsf");
+				if (-1 ==close(pp[PIPE_WRITE]))
+					perror("adfadf");
 		    }
 			if(m == 4){
-				dup2(fd[PIPE_WRITE],1);
-				close(fd[PIPE_READ]);
+				if(-1==dup2(fd[PIPE_WRITE],1))
+					perror("afad");
+				if (-1 == close(fd[PIPE_READ]))
+					perror("asdfdsa");
 			}
 			execute(args, flag, dupchar);
 			clean(args);  //clean arguments 
@@ -299,8 +328,10 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 			int y;
 			if ((y = wait(0)) == -1)
 				perror("wait error");
-			if(m == 4)
-				close(fd[PIPE_WRITE]);
+			if(m == 4){
+				if (-1 ==close(fd[PIPE_WRITE]))
+					perror("asdfasdf");
+			}
 			i++;
 			if(i != num)
 				run_pipe(cmd,i,fd);
