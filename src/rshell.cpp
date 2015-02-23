@@ -12,6 +12,7 @@ int ret = 0;
 int num  = 0;
 int flag[64];
 int savestdin;
+int in,out;
 int execute(char ** args, int flag, char * dupchar);
 int ope(char * cut, char * a, char * b, char* c);
 int main(int argc, char **argv, char **envp)
@@ -165,6 +166,7 @@ static int run(char *execu){
 	dupchar = strtok(dupchar, " \n");
 	execu = strtok_r(execu, " \n", &save);
     int a = 0;
+	clean(args);  //clean arguments 
 	while (execu != NULL){
 		args[a] = execu;
 		++a;
@@ -182,7 +184,6 @@ static int run(char *execu){
 		else if (pid == 0)
 		{
 			execute(args, flag, dupchar);	
-			clean(args);  //clean arguments 
 			exit(1);											
 		}
 		else {
@@ -195,7 +196,6 @@ static int run(char *execu){
 
 int execute(char ** args, int flag, char * dupchar) //execute different dup 
 {
-	int in,out;
 	char buf[1024];
 	switch (flag)
 	{
@@ -204,8 +204,8 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 				perror("Command not found");
 			break;
 		case 1:
-				if(-1 ==(in = open(dupchar, O_RDWR, S_IRUSR|S_IWUSR)))
-					perror("open error");
+			if(-1 ==(in = open(dupchar, O_RDWR, S_IRUSR|S_IWUSR)))
+				perror("open error");
 				if(-1 ==dup2(in, 0)){
 					perror("dup error");
 					return 1;
@@ -283,6 +283,9 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 				perror("adfadsf");
 			break;
 	}
+
+	printf("test");
+
 	return 0;
 }
 
@@ -300,7 +303,7 @@ int ope(char *cut, char * a , char * b, char* c){
 	char *d = c;
 	char e[1024];
     if(b!= NULL) {
-	strncpy(e,d, b-a);  //get operator from input
+	strncpy(e,d + (a - cut), b-a);  //get operator from input
 	e[b-a] = '\0';
 	if (strstr(e, ";") !=NULL) return 0; 
 	else if (strstr(e,"||")!= NULL) return 1;
@@ -354,6 +357,7 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 	dupchar = strtok(dupchar, " \n");
 	execu = strtok_r(execu, " \n", &save);
     int a = 0;
+	clean(args);  //clean arguments 
 	while (execu != NULL){
 		args[a] = execu;
 		++a;
@@ -362,10 +366,6 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 	if (strcmp(args[0], "exit") == 0)  //inner exit command
 		exit(0);
 	else{
-		if(i == 0){
-			if (-1 == (savestdin = dup(0)))
-				perror("savestdin error");
-		}
 		int pid = fork();
 		if(pid == -1){
 			perror("fork error");
@@ -375,16 +375,13 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 		{
 			if(i != 0){
 				if (-1 == dup2(pp[PIPE_READ], 0))
-					perror("asdfadsf");
+					perror("1");
 		    }
 			if(m == 4){
 				if(-1==dup2(fd[PIPE_WRITE],1))
-					perror("afad");
-				if (-1 == close(fd[PIPE_READ]))
-					perror("asdfdsa");
+					perror("2");
 			}
 			execute(args, flag, dupchar);
-			clean(args);  //clean arguments 
 			exit(1);											
 		}
 		else if(pid > 0)
@@ -394,8 +391,12 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 				perror("wait error");
 			if(m == 4){
 				if (-1 ==close(fd[PIPE_WRITE]))
-					perror("asdfasdf");
+					perror("3");
 			}
+			if(i != 0){
+				if (-1 == close(pp[PIPE_READ]))
+					perror("4");
+		    }
 			i++;
 			if(i != num)
 				run_pipe(cmd,i,fd);
