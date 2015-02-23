@@ -1,0 +1,187 @@
+Script started on Mon 23 Feb 2015 06:10:46 AM PST
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ binr[Kr[K/r
+bash: bin/r: No such file or directory
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ bin/rs[K[K[K[K[K[Kmake
+g++ -Wall -Werror -ansi -pedantic -o rshell ./src/rshell.cpp
+g++ -Wall -Werror -ansi -pedantic -o ls ./src/ls.cpp
+mkdir bin
+mv ./rshell ./bin/rshell
+mv ./ls ./bin/ls
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ bin/rshell 
+sherman@ubuntu>>ls > test.txt
+sherman@ubuntu>>ls  >test.txt
+sherman@ubuntu>>ls                  >                  test.txt
+sherman@ubuntu>>ls >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..test.tt xt
+invalid IO redirection
+sherman@ubuntu>>ls > > > > > > > > > > > > > > > > > > > > > > > > > > > > >> > > > > > > > > > > > > > > > > >  > > > > > > > > > > > > > > > >test.txt
+invalid IO redirection
+sherman@ubuntu>>ls > 
+open error: Bad address
+dup error: Bad file descriptor
+sherman@ubuntu>>ls > .
+open error: Is a directory
+dup error: Bad file descriptor
+sherman@ubuntu>>ls > test.txt file1 file2 file3 file5 file  4 file5 fil5 fisl0
+sherman@ubuntu>>ls >> test.txt
+sherman@ubuntu>>ls >>   >>  test.txt
+sherman@ubuntu>>ls              >>                          test.txt
+sherman@ubuntu>>ls >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >  > e test.txt
+invalid IO redirection
+sherman@ubuntu>>ls >> 
+open error: Bad address
+dup error: Bad file descriptor
+sherman@ubuntu>>ls >> filenotexit  ist
+open error: No such file or directory
+dup error: Bad file descriptor
+sherman@ubuntu>>ls >> .
+open error: Is a directory
+dup error: Bad file descriptor
+sherman@ubuntu>>ls >> test.txt f1 f2 fe3 fasd a asdf ga a fa  asf
+sherman@ubuntu>>ls >>  1> test.txt
+sherman@ubuntu>>ls 2> test.txt
+bin	 Makefile	README.md  tests     typescript
+LICENSE  piping.script	src	   test.txt
+sherman@ubuntu>>ls 1>> test.txt
+sherman@ubuntu>>ls 2>> test.txt
+bin	 Makefile	README.md  tests     typescript
+LICENSE  piping.script	src	   test.txt
+sherman@ubuntu>>ls -a -l - . > testt .txt
+sherman@ubuntu>>ls -a -l . >> test.txt
+sherman@ubuntu>>ls    cat < test.txt
+total 80
+drwxrwxr-x 6 sherman sherman  4096 Feb 23 06:11 .
+drwxrwxr-x 4 sherman sherman  4096 Feb 21 03:56 ..
+drwxrwxr-x 2 sherman sherman  4096 Feb 23 06:10 bin
+drwxrwxr-x 8 sherman sherman  4096 Feb 23 05:24 .git
+-rw-rw-r-- 1 sherman sherman   772 Feb 21 03:56 LICENSE
+-rw-rw-r-- 1 sherman sherman   234 Feb 22 22:32 Makefile
+-rw-rw-r-- 1 sherman sherman     0 Feb 23 06:10 piping.script
+-rw-rw-r-- 1 sherman sherman  1063 Feb 21 03:56 README.md
+drwxrwxr-x 2 sherman sherman  4096 Feb 23 05:58 src
+drwxrwxr-x 2 sherman sherman  4096 Feb 21 03:56 tests
+-rw------- 1 sherman sherman   450 Feb 23 06:14 test.txt
+-rw-rw-r-- 1 sherman sherman 18347 Feb 23 02:57 typescript
+-rw-r--r-- 1 sherman sherman 16384 Feb 23 05:24 .typescript.swp
+total 80
+drwxrwxr-x 6 sherman sherman  4096 Feb 23 06:11 .
+drwxrwxr-x 4 sherman sherman  4096 Feb 21 03:56 ..
+drwxrwxr-x 2 sherman sherman  4096 Feb 23 06:10 bin
+drwxrwxr-x 8 sherman sherman  4096 Feb 23 05:24 .git
+-rw-rw-r-- 1 sherman sherman   772 Feb 21 03:56 LICENSE
+-rw-rw-r-- 1 sherman sherman   234 Feb 22 22:32 Makefile
+-rw-rw-r-- 1 sherman sherman     0 Feb 23 06:10 piping.script
+-rw-rw-r-- 1 sherman sherman  1063 Feb 21 03:56 README.md
+drwxrwxr-x 2 sherman sherman  4096 Feb 23 05:58 src
+drwxrwxr-x 2 sherman sherman  4096 Feb 21 03:56 tests
+-rw------- 1 sherman sherman   734 Feb 23 06:14 test.txt
+-rw-rw-r-- 1 sherman sherman 18347 Feb 23 02:57 typescript
+-rw-r--r-- 1 sherman sherman 16384 Feb 23 05:24 .typescript.swp
+sherman@ubuntu>>rm test.txt
+sherman@ubuntu>>ls > test.txt | head                 | head > test.txt
+sherman@ubuntu>>cat < test.txt
+bin
+LICENSE
+Makefile
+piping.script
+README.md
+src
+tests
+typescript
+sherman@ubuntu>>cat  <test.txt
+bin
+LICENSE
+Makefile
+piping.script
+README.md
+src
+tests
+typescript
+sherman@ubuntu>>cat                                   <             test.txt
+bin
+LICENSE
+Makefile
+piping.script
+README.md
+src
+tests
+typescript
+sherman@ubuntu>>cat <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,,,test.txt
+invalid IO redirection
+sherman@ubuntu>>cat < <  < < < << < < < << < < < < < < << < < < < < < < < < < < < < < < < < < <  << < < < < <  << < <  << < < < < <  < << <  < < < < << < test.txt
+invalid IO redirection
+sherman@ubuntu>>cat <<<<>>>>> <>> <> <>< ><>> <> > < > <> > test.txt
+invalid IO redirection
+sherman@ubuntu>>cat < 
+open error: Bad address
+dup error: Bad file descriptor
+sherman@ubuntu>>cat , .   < .
+open error: Is a directory
+dup error: Bad file descriptor
+sherman@ubuntu>>cat << .
+invalid IO redirection
+sherman@ubuntu>>ca  t << test.txt
+invalid IO redirection
+sherman@ubuntu>>cat << extra points
+invalid IO redirection
+sherman@ubuntu>>cat <<< extra points
+ extra points
+sherman@ubuntu>>ls|head
+bin
+LICENSE
+Makefile
+piping.script
+README.md
+src
+temp.txt
+tests
+test.txt
+typescript
+sherman@ubuntu>>ls | grep txt
+temp.txt
+test.txt
+sherman@ubuntu>>ls |    |head -n 9 | head _n  0 -n 8 | head -n7  7 | head -n 6| head -n 5
+bin
+LICENSE
+Makefile
+piping.script
+README.md
+sherman@ubuntu>>ls < t      cat < test.txt \   | cat
+bin
+LICENSE
+Makefile
+piping.script
+README.md
+src
+tests
+typescript
+sherman@ubuntu>>ls | cat > test.txt
+sherman@ubuntu>>cat     ls > test.txt | cat
+Invalid IO redirection!
+sherman@ubuntu>>ls | cat < test.txt
+Invalid IO redirection!
+sherman@ubuntu>>cat < test.txt| tr   tr a-z A-Z  |tee 1.  a.txt| t  tr _ A-Z a-z|  > b .  .txt
+sherman@ubuntu>>cat a.txt
+BIN
+LICENSE
+MAKEFILE
+PIPING.SCRIPT
+README.MD
+SRC
+TEMP.TXT
+TESTS
+TEST.TXT
+TYPESCRIPT
+sherman@ubuntu>>cat b.txt
+bin
+license
+makefile
+piping.script
+readme.md
+src
+temp.txt
+tests
+test.txt
+typescript
+sherman@ubuntu>>exit
+]0;sherman@ubuntu: ~/rshell/rshellsherman@ubuntu:~/rshell/rshell$ exit
+Script done on Mon 23 Feb 2015 06:21:51 AM PST

@@ -93,6 +93,7 @@ int main(int argc, char **argv, char **envp)
 static int run(char *execu){ 
 	int status;
 	char * dupchar;
+//	char * dupchar1;
 	char *save;
 	int flag;
 	char *args[1024];
@@ -105,6 +106,26 @@ static int run(char *execu){
 			str1[3] = '\0';
 			if ((strcmp(str1,"<<<") == 0) &&(strpbrk(pch+3,"<>") == NULL))
 				flag = 4;		
+			else {
+				printf("invalid IO redirection\n");
+				return 1;}
+		}
+		else if (strstr(pch, "1>>")!= NULL){
+			char str8[4];
+			strncpy(str8,pch,3);
+			str8[3] = '\0';
+			if ((strcmp(str8,"1>>") == 0) &&(strpbrk(pch+3,"<>") == NULL))
+				flag = 8;		
+			else {
+				printf("invalid IO redirection\n");
+				return 1;}
+		}
+		else if (strstr(pch, "2>>")!= NULL){
+			char str7[4];
+			strncpy(str7,pch,3);
+			str7[3] = '\0';
+			if ((strcmp(str7,"2>>") == 0) &&(strpbrk(pch+3,"<>") == NULL))
+				flag = 7;		
 			else {
 				printf("invalid IO redirection\n");
 				return 1;}
@@ -163,7 +184,7 @@ static int run(char *execu){
 	else flag = 0;
 	execu = strtok(execu, "<12>");
 	dupchar = strtok(NULL, "<12>");
-	dupchar = strtok(dupchar, " \n");
+//	dupchar = strtok(dupchar, " \n");
 	execu = strtok_r(execu, " \n", &save);
     int a = 0;
 	clean(args);  //clean arguments 
@@ -204,6 +225,7 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 				perror("Command not found");
 			break;
 		case 1:
+			dupchar = strtok(dupchar, " \n");
 			if(-1 ==(in = open(dupchar, O_RDWR, S_IRUSR|S_IWUSR)))
 				perror("open error");
 				if(-1 ==dup2(in, 0)){
@@ -216,6 +238,7 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 					perror("close error");
 			break;
 		case 2:
+				dupchar = strtok(dupchar, " \n");
 				if (-1 == (out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)))
 					perror("open error");
 				if (-1 ==dup2(out, 1)){
@@ -228,6 +251,7 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 					perror("close error");
 			break;
 		case 3:
+				dupchar = strtok(dupchar, " \n");
 				if (-1 == (out = open(dupchar, O_RDWR|O_APPEND, S_IRUSR|S_IWUSR)))
 					perror("open error");
 				if(-1 ==dup2(out, 1)){
@@ -259,6 +283,7 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 					perror("adfasd");
 			break;
 		case 5:
+				dupchar = strtok(dupchar, " \n");
 				if (-1 == (out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)))
 					perror("open error");
 				if(-1 == dup2(out, 1)){
@@ -271,9 +296,36 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 					perror("asdfasdf");
 			break;
 		case 6:
+			dupchar = strtok(dupchar, " \n");
 			if (-1 == (out = open(dupchar, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR)))
 				perror("open error");
 			if (-1 == dup2(out, 2)){				
+				perror("dup error");
+				return 1;
+			}
+			if (execvp(args[0], args) != 0)
+				perror("Command not found");
+			if (-1 == close(out))
+				perror("adfadsf");
+			break;
+		case 7:
+				dupchar = strtok(dupchar, " \n");
+				if (-1 == (out = open(dupchar, O_RDWR|O_APPEND, S_IRUSR|S_IWUSR)))
+					perror("open error");
+				if(-1 == dup2(out, 2)){
+					perror("open error");
+					return 1;
+				}
+				if (execvp(args[0], args) != 0)
+					perror("Command not found");
+				if (-1 == close(out))
+					perror("asdfasdf");
+			break;
+		case 8:
+			dupchar = strtok(dupchar, " \n");
+			if (-1 == (out = open(dupchar, O_RDWR|O_APPEND, S_IRUSR|S_IWUSR)))
+				perror("open error");
+			if (-1 == dup2(out, 1)){				
 				perror("dup error");
 				return 1;
 			}
