@@ -298,7 +298,7 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 	else{
 		if(i == 0){
 			if (-1 == (savestdin = dup(0)))
-				perror("adfadf");
+				perror("savestdin error");
 		}
 		int pid = fork();
 		if(pid == -1){
@@ -310,8 +310,8 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 			if(i != 0){
 				if (-1 == dup2(pp[PIPE_READ], 0))
 					perror("asdfadsf");
-				if (-1 ==close(pp[PIPE_WRITE]))
-					perror("adfadf");
+			//	if (-1 ==close(pp[PIPE_WRITE]))
+			//		perror("adfadf");
 		    }
 			if(m == 4){
 				if(-1==dup2(fd[PIPE_WRITE],1))
