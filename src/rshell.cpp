@@ -5,31 +5,46 @@
 #include <sys/wait.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <signal.h>
+
+
 static int run(char *);
 int run_pipe(char cmd[64][1024],int i, int pp[2]);
 void clean(char *args[]);
 int ret = 0;
 int num  = 0;
 int flag[64];
+int sig;
 int savestdin;
 int in,out;
 int execute(char ** args, int flag, char * dupchar);
 int ope(char * cut, char * a, char * b, char* c);
+int parse_path(char path[64][1024], char* pathlist);
+void execv_r(char *argu[]);
+void sighandler(int);
 int main(int argc, char **argv, char **envp)
 {
 
 	char line[1024]; 
 	char host[100];
-//	char *user;
+	char *user;
 	char *save;
-	
+	char buff[128];
+	signal(SIGINT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
 	while(1){
-		//if(NULL == (user = getlogin()))
-	//		perror("getlogin");    //get user name
+//		signal(SIGINT, sig_c_handler);
+		if(NULL == (user = getlogin()))
+			perror("getlogin");    //get user name
 		if (-1 == (gethostname(host, 100)))
 			perror("gethostname");    //get os name
-		printf("%s@%s>>", "sherman", host);	        //print machine info
-        fflush(NULL);
+		if(getcwd(buff, 1024) == NULL)
+			perror("getcwd error");
+		printf("[%s@%s]%s>>", user, host,buff);//print machine info
+
+        fflush(stdout);
 
         if(!fgets(line, 1024, stdin))       
         	return 0;
@@ -91,9 +106,8 @@ int main(int argc, char **argv, char **envp)
 }
 
 static int run(char *execu){ 
-	int status;
+//	int status;
 	char * dupchar;
-//	char * dupchar1;
 	char *save;
 	int flag;
 	char *args[1024];
@@ -184,7 +198,6 @@ static int run(char *execu){
 	else flag = 0;
 	execu = strtok(execu, "<12>");
 	dupchar = strtok(NULL, "<12>");
-//	dupchar = strtok(dupchar, " \n");
 	execu = strtok_r(execu, " \n", &save);
     int a = 0;
 	clean(args);  //clean arguments 
@@ -196,7 +209,20 @@ static int run(char *execu){
 		
 	if (strcmp(args[0], "exit") == 0)  //inner exit command
 		exit(0);
-	else{
+	if(strcmp(args[0], "cd") == 0){
+		if((args[1] == NULL)||(strcmp(args[1], "~") == 0)){
+			char *home;
+			if((home = getenv("HOME")) == NULL)
+				perror("getenv error");
+			if(-1 == chdir(home))
+				perror("chdir error");
+		}
+		else{
+			if(-1 == chdir(args[1]))
+				perror("chdir error");
+		}
+	}
+	else {
 		int pid = fork();
 		if(pid == -1){
 			perror("fork error");
@@ -204,15 +230,23 @@ static int run(char *execu){
 		}			
 		else if (pid == 0)
 		{
+	//		signal(SIGTSTP, SIG_DFL);
 			execute(args, flag, dupchar);	
 			exit(1);											
 		}
-		else {
-		 	if( wait(&status) == -1)  //save the child process exit value
-				perror("error");      // to statue and return it to parent 
-			return WEXITSTATUS(status);	//process    
+		else{
+			sighandler_t sigc = signal(SIGCHLD, sighandler);
+			while(1){
+				if(sigc != SIG_ERR)
+					break;
+			}
+			// 	if( wait(&status) == -1)  //save the child process exit value
+			//		perror("error");      // to statue and return it to parent 
+			//	return WEXITSTATUS(status);	//process  
+			
 		}	    
 	}
+	return 0;
 }
 
 int execute(char ** args, int flag, char * dupchar) //execute different dup 
@@ -221,8 +255,7 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 	switch (flag)
 	{
 		case 0:
-			if (execvp(args[0], args) != 0)
-				perror("Command not found");
+			execv_r(args);
 			break;
 		case 1:
 			dupchar = strtok(dupchar, " \n");
@@ -335,9 +368,6 @@ int execute(char ** args, int flag, char * dupchar) //execute different dup
 				perror("adfadsf");
 			break;
 	}
-
-	printf("test");
-
 	return 0;
 }
 
@@ -459,4 +489,56 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 	return 0;
 }
 
+int parse_path(char path[64][1024], char *pathlist){
+	char * pch;
+	char buf[128];
+	int i = 0;
+	if (getcwd(buf, 128) == NULL)
+		perror("getcwd error");
+	strncpy(path[i], buf, strlen(buf));
+	strncat(path[i],"/bin",4);
+	i++;
+	pch = strtok(pathlist, ":");
+	int j = 0;
+	while(pch != NULL){
+		j = strlen(pch);
+		strncpy(path[i], pch, j);
+		path[i][j] = '\0';
+	//	printf("%s\n", path[i]);
+		i++;
+		pch = strtok(NULL, ":");
+	}
+	return i;
+}
 
+
+void execv_r(char *argu[]){
+	char *pathlist;
+	char path[64][1024];
+	DIR *dirp;
+	struct dirent *direntp;
+	int i = 0;
+	int j;
+	if((pathlist = getenv("PATH")) == NULL)
+		perror("getenv error");
+	j = parse_path(path, pathlist);
+	for (i = 0; i < j; i++){
+		if((dirp = opendir(path[i])) == NULL){
+			perror("open error");
+			exit(1);
+		}
+		while((direntp = readdir(dirp)) != NULL ){
+			if ((strcmp(direntp->d_name, argu[0]) != 0))
+				continue;
+			strncat(path[i],"/",1);
+			strncat(path[i],argu[0],strlen(argu[0]));
+			if(-1 == execv(path[i],argu))
+				perror("execv error");
+		}
+	}
+	printf("command not found\n");
+}
+
+void sighandler(int num){
+	printf("babab\n");	
+}
