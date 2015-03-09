@@ -538,28 +538,17 @@ int parse_path(char path[64][1024], char *pathlist){
 
 
 void execv_r(char *argu[]){
-	DIR *dirp;
-	struct dirent *direntp;
 	int i = 0;
-	int j;
+	int j = 0;
 	if((pathlist = getenv("PATH")) == NULL)
 		perror("getenv error");
 	j = parse_path(path, pathlist);
-	for (i = 0; i < j; i++){
-		if((dirp = opendir(path[i])) == NULL){
-			perror("open error");
-			exit(1);
-		}
-		while((direntp = readdir(dirp)) != NULL ){
-			if ((strcmp(direntp->d_name, argu[0]) != 0))
-				continue;
-			strncat(path[i],"/",1);
-			strncat(path[i],argu[0],strlen(argu[0]));
-			if(-1 == execv(path[i],argu))
-				perror("execv error");
-		}
+	for(i = 0;i < j;i++){
+		strncat(path[i],"/",1);
+		strncat(path[i],argu[0],strlen(argu[0]));
+		execv(path[i],argu);
 	}
-	printf("command not found\n");
+	perror("execv error");
 }
 
 void sighandler(int num){	
