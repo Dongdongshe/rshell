@@ -38,9 +38,9 @@ int main(int argc, char **argv, char **envp)
 
 	char line[1024]; 
 	char *save;
-	if(-1 == signal(SIGINT, SIG_IGN))
+	if(SIG_ERR == signal(SIGINT, SIG_IGN))
 		perror("afasdf");
-	if(-1 == signal(SIGTSTP, SIG_IGN))
+	if(SIG_ERR == signal(SIGTSTP, SIG_IGN))
 		perror("adf");
 	char buf[128];
 	if (getcwd(buf, 128) == NULL)
@@ -257,9 +257,9 @@ static int run(char *execu){
 		}			
 		else if (pid == 0)
 		{
-			if(-1 == signal(SIGINT, SIG_DFL))
+			if(SIG_ERR == signal(SIGINT, SIG_DFL))
 				perror("asdfa");
-			if(-1 == signal(SIGTSTP, SIG_DFL))
+			if(SIG_ERR == signal(SIGTSTP, SIG_DFL))
 				perror("adfadf");
 			execute(args, flag, dupchar);	
 			exit(1);											
