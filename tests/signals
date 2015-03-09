@@ -1,0 +1,42 @@
+# test cd
+pwd
+cd .
+pwd
+cd src/rshell.cpp #cd a file
+cd rshell         #cd a directory
+pwd
+cd                #cd non 
+pwd
+cd /directory/not/exist   # cd a non-exist directory
+cd ..
+
+#Commands from different directories
+# from /usr/bin:
+md5sum --help >/dev/null
+# from /usr/sbin:
+ifconfig >/dev/null
+# from /bin:
+ls >/dev/null
+# from /sbin:
+mkfs --help >/dev/null
+nonexistcommand   #non-exist command
+
+# test Ctrl+C
+cat
+
+# test Ctrl+C again
+top
+
+
+#case for some extra credit:
+#case for fg
+cat
+
+ps
+fg
+
+#case for bg
+ping 8.8.8.8
+
+bg
+

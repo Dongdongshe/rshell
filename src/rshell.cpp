@@ -15,10 +15,19 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]);
 void clean(char *args[]);
 int ret = 0;
 int num  = 0;
+int pid_store;
 int flag[64];
+	char *pathlist;
+	char path[64][1024];
+int pid;
+int exi = 0;
 int sig;
+int status;
 int savestdin;
 int in,out;
+char host[100];
+char buff[128];
+char *user;
 int execute(char ** args, int flag, char * dupchar);
 int ope(char * cut, char * a, char * b, char* c);
 int parse_path(char path[64][1024], char* pathlist);
@@ -28,24 +37,24 @@ int main(int argc, char **argv, char **envp)
 {
 
 	char line[1024]; 
-	char host[100];
-	char *user;
 	char *save;
-	char buff[128];
 	signal(SIGINT, SIG_IGN);
 	signal(SIGTSTP, SIG_IGN);
+	char buf[128];
+	if (getcwd(buf, 128) == NULL)
+		perror("getcwd error");
+	strncpy(path[0], buf, strlen(buf));
+	strncat(path[0],"/bin",4);
 	while(1){
-//		signal(SIGINT, sig_c_handler);
-		if(NULL == (user = getlogin()))
-			perror("getlogin");    //get user name
-		if (-1 == (gethostname(host, 100)))
-			perror("gethostname");    //get os name
-		if(getcwd(buff, 1024) == NULL)
-			perror("getcwd error");
-		printf("[%s@%s]%s>>", user, host,buff);//print machine info
+	if(NULL == (user = getlogin()))
+		perror("getlogin");    //get user name
+	if (-1 == (gethostname(host, 100)))
+		perror("gethostname");    //get os name
+	if(getcwd(buff, 1024) == NULL)
+		perror("getcwd error");
+	printf("[%s@%s]%s>>", user, host,buff);//print machine info
 
-        fflush(stdout);
-
+		fflush(stdout);
         if(!fgets(line, 1024, stdin))       
         	return 0;
 		char * cut = line;            
@@ -112,7 +121,8 @@ static int run(char *execu){
 	int flag;
 	char *args[1024];
 	char * pch;
-
+	
+	exi = 0;
 	if((pch = strpbrk(execu,"<12>"))!=NULL){
 		if (strstr(pch, "<<<")!= NULL){
 			char str1[4];
@@ -209,7 +219,8 @@ static int run(char *execu){
 		
 	if (strcmp(args[0], "exit") == 0)  //inner exit command
 		exit(0);
-	if(strcmp(args[0], "cd") == 0){
+
+	else if(strcmp(args[0], "cd") == 0){
 		if((args[1] == NULL)||(strcmp(args[1], "~") == 0)){
 			char *home;
 			if((home = getenv("HOME")) == NULL)
@@ -222,29 +233,48 @@ static int run(char *execu){
 				perror("chdir error");
 		}
 	}
+
+	else if((pid != 0)&&(strcmp(args[0], "fg") == 0)){
+		kill(pid_store,SIGCONT);
+		waitpid(pid_store,&status, WUNTRACED);
+	//	signal(SIGCHLD, sighandler);
+	//	while(1){
+	//		if(exi)
+	//			break;
+	//	}
+	}
+
+	else if((pid != 0)&&(strcmp(args[0], "bg") == 0)){
+		kill(pid_store,SIGCONT);
+		waitpid(pid_store,&status, WCONTINUED);
+	}
+
 	else {
-		int pid = fork();
+		pid = fork();
 		if(pid == -1){
 			perror("fork error");
 			exit(1);
 		}			
 		else if (pid == 0)
 		{
-	//		signal(SIGTSTP, SIG_DFL);
+			signal(SIGINT, SIG_DFL);
+			signal(SIGTSTP, SIG_DFL);
 			execute(args, flag, dupchar);	
 			exit(1);											
 		}
 		else{
-			sighandler_t sigc = signal(SIGCHLD, sighandler);
-			while(1){
-				if(sigc != SIG_ERR)
-					break;
-			}
-			// 	if( wait(&status) == -1)  //save the child process exit value
-			//		perror("error");      // to statue and return it to parent 
-			//	return WEXITSTATUS(status);	//process  
+		//	sighandler_t sigc = signal(SIGCHLD, sighandler);
+			if( waitpid(pid,&status,WUNTRACED) == -1)  //save the child process exit value
+					perror("error");      // to statue and return it to parent 
 			
-		}	    
+			if(WIFSTOPPED(status))
+				pid_store=pid;
+			return WEXITSTATUS(status);	//process  
+	//		while(1){
+	//			if(exi)
+	//				break;
+	//		}
+		}		    
 	}
 	return 0;
 }
@@ -491,13 +521,8 @@ int run_pipe(char cmd[64][1024],int i, int pp[2]) // execute command
 
 int parse_path(char path[64][1024], char *pathlist){
 	char * pch;
-	char buf[128];
-	int i = 0;
-	if (getcwd(buf, 128) == NULL)
-		perror("getcwd error");
-	strncpy(path[i], buf, strlen(buf));
-	strncat(path[i],"/bin",4);
-	i++;
+//	char buf[128];
+	int i = 1;
 	pch = strtok(pathlist, ":");
 	int j = 0;
 	while(pch != NULL){
@@ -513,8 +538,6 @@ int parse_path(char path[64][1024], char *pathlist){
 
 
 void execv_r(char *argu[]){
-	char *pathlist;
-	char path[64][1024];
 	DIR *dirp;
 	struct dirent *direntp;
 	int i = 0;
@@ -539,6 +562,7 @@ void execv_r(char *argu[]){
 	printf("command not found\n");
 }
 
-void sighandler(int num){
-	printf("babab\n");	
+void sighandler(int num){	
+	//waitpid(sdfpid_store,&status, WUNTRACED);
+	exi = 1;
 }
