@@ -115,7 +115,6 @@ int main(int argc, char **argv, char **envp)
 }
 
 static int run(char *execu){ 
-//	int status;
 	char * dupchar;
 	char *save;
 	int flag;

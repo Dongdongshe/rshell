@@ -1,22 +1,23 @@
 # test cd
 pwd
-cd .
+cd .             # cd a relative path
 pwd
 cd src/rshell.cpp #cd a file
-cd rshell         #cd a directory
+cd src        #cd a directory
 pwd
 cd                #cd non 
 pwd
 cd /directory/not/exist   # cd a non-exist directory
-cd ..
+cd /home/                  #cd a absolute path
+cd /root/                  # cd a dir without permission
 
-#Commands from different directories
+#test commands from different directories
+#from rshell/bin/ls
+ls
 # from /usr/bin:
 md5sum --help >/dev/null
 # from /usr/sbin:
 ifconfig >/dev/null
-# from /bin:
-ls >/dev/null
 # from /sbin:
 mkfs --help >/dev/null
 nonexistcommand   #non-exist command
@@ -40,3 +41,5 @@ ping 8.8.8.8
 
 bg
 
+# test multiples 
+
