@@ -48,13 +48,13 @@ int main(int argc, char **argv, char **envp)
 	strncpy(path[0], buf, strlen(buf));
 	strncat(path[0],"/bin",4);
 	while(1){
-	if(NULL == (user = getlogin()))
-		perror("getlogin");    //get user name
+//	if(NULL == (user = getlogin()))
+//		perror("getlogin");    //get user name
 	if (-1 == (gethostname(host, 100)))
 		perror("gethostname");    //get os name
 	if(getcwd(buff, 1024) == NULL)
 		perror("getcwd error");
-	printf("[%s@%s]%s>>", user, host,buff);//print machine info
+	printf("[%s@%s]%s>>", "sherman", host,buff);//print machine info
 
 		fflush(stdout);
         if(!fgets(line, 1024, stdin))       
@@ -546,9 +546,13 @@ void execv_r(char *argu[]){
 		perror("getenv error");
 	j = parse_path(path, pathlist);
 	for(i = 0;i < j;i++){
-		strncat(path[i],"/",1);
-		strncat(path[i],argu[0],strlen(argu[0]));
-		execv(path[i],argu);
+		if(argu[0][0] != '/'){
+			strncat(path[i],"/",1);
+			strncat(path[i],argu[0],strlen(argu[0]));
+			execv(path[i],argu);
+		}
+		else 
+			execv(argu[0],argu);
 	}
 	perror("execv error");
 }
