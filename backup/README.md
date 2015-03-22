@@ -29,6 +29,6 @@ Run server using netcat which response to one connection a time.
 Feature
 -----------
 1. Rapache supports HTTP GET and POST methods.
-2. Rapache implements two ways(netcat or tcpserver) to handle tcp connections.
+2. Rapache can handle multiple connections using `tcpserver`.
 3. Rapache runs in daemon mode.
 
